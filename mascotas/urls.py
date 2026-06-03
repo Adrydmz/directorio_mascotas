@@ -9,4 +9,7 @@ urlpatterns = [
     path('nueva/', views.MascotaCreateView.as_view(), name='crear_mascota'),
     path('<int:pk>/editar/', views.MascotaUpdateView.as_view(), name='editar_mascota'),
     path('<int:pk>/eliminar/', views.MascotaDeleteView.as_view(), name='eliminar_mascota'),
+    path('<int:pk>/contactar/', views.EnviarMensajeView.as_view(), name='contactar_dueno'),
+    path('mensajes/', views.BandejaMensajesView.as_view(), name='bandeja_mensajes'),
+    path('mensajes/<int:msj_id>/responder/', views.ResponderMensajeView.as_view(), name='responder_mensaje'),
 ]

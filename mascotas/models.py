@@ -71,3 +71,37 @@ class Avistamiento(models.Model):
 
     def __str__(self):
         return f"Avistamiento de {self.mascota.nombre} en {self.ubicacion_avistamiento}"
+
+# NUEVA TABLA: Sistema de Mensajería Directa
+class MensajeContacto(models.Model):
+    """
+    Gestiona los mensajes enviados entre usuarios (máximo 5 por día según requerimientos).
+    """
+    remitente = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='mensajes_enviados',
+        verbose_name='Remitente'
+    )
+    destinatario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='mensajes_recibidos',
+        verbose_name='Destinatario'
+    )
+    mascota = models.ForeignKey(
+        MascotaPerdida, 
+        on_delete=models.CASCADE, 
+        related_name='consultas',
+        verbose_name='Mascota en cuestión'
+    )
+    mensaje = models.TextField(max_length=500, verbose_name='Mensaje')
+    fecha_envio = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de envío')
+
+    class Meta:
+        verbose_name = 'Mensaje de Contacto'
+        verbose_name_plural = 'Mensajes de Contacto'
+        ordering = ['-fecha_envio'] # Los más recientes primero
+
+    def __str__(self):
+        return f"De {self.remitente.email} a {self.destinatario.email} sobre {self.mascota.nombre}"

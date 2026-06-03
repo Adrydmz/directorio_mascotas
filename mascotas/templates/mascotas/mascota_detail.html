@@ -3,6 +3,13 @@
 {% block content %}
 <div class="row justify-content-center mt-4 mb-5">
     <div class="col-lg-10">
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} rounded-4 border-0 shadow-sm" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
         <a href="{% url 'mascotas:lista_mascotas' %}" class="text-decoration-none text-muted mb-4 d-inline-block fw-medium">
             <i class="bi bi-arrow-left me-2"></i>Volver al directorio
         </a>
@@ -45,19 +52,47 @@
                         <p class="text-muted small mb-1 fw-medium">Reportado por:</p>
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-person-circle fs-3 text-secondary"></i>
-                            <a href="mailto:{{ mascota.usuario_reporta.email }}" class="text-decoration-none fw-medium text-dark">{{ mascota.usuario_reporta.email }}</a>
+                            <span class="fw-medium text-dark">{{ mascota.usuario_reporta.first_name|default:mascota.usuario_reporta.email }}</span>
                         </div>
                     </div>
 
-                    {% if user == mascota.usuario_reporta %}
-                    <div class="d-flex gap-2 mt-4 pt-4" style="border-top: 1px solid var(--border-color);">
-                        <a href="{% url 'mascotas:editar_mascota' mascota.pk %}" class="btn btn-google-outline flex-grow-1"><i class="bi bi-pencil me-2"></i>Editar</a>
-                        <a href="{% url 'mascotas:eliminar_mascota' mascota.pk %}" class="btn btn-google-danger flex-grow-1"><i class="bi bi-trash me-2"></i>Eliminar</a>
+                    <div class="d-flex flex-column gap-2 mt-4 pt-4" style="border-top: 1px solid var(--border-color);">
+                        {% if user == mascota.usuario_reporta %}
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'mascotas:editar_mascota' mascota.pk %}" class="btn btn-google-outline flex-grow-1"><i class="bi bi-pencil me-2"></i>Editar</a>
+                                <a href="{% url 'mascotas:eliminar_mascota' mascota.pk %}" class="btn btn-google-danger flex-grow-1"><i class="bi bi-trash me-2"></i>Eliminar</a>
+                            </div>
+                        {% elif user.is_authenticated %}
+                            <button type="button" class="btn btn-google-primary btn-lg w-100 shadow-sm" data-bs-toggle="modal" data-bs-target="#contactoModal">
+                                <i class="bi bi-chat-dots-fill me-2"></i> Enviar Mensaje al Dueño
+                            </button>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %} {% block modals %}
+<div class="modal fade" id="contactoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold"><i class="bi bi-envelope-paper-heart text-primary me-2"></i> Mensaje para el dueño</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'mascotas:contactar_dueno' mascota.pk %}">
+          <div class="modal-body">
+            {% csrf_token %}
+            <p class="text-muted small mb-3">Tienes un límite de 5 mensajes diarios. Asegúrate de incluir algún medio de contacto si lo deseas.</p>
+            <textarea name="mensaje" class="form-control rounded-3" rows="4" placeholder="Hola, creo que vi a {{ mascota.nombre }} en..." required maxlength="500"></textarea>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn text-muted fw-medium" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-google-primary px-4 rounded-pill">Enviar Mensaje</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock modals %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Mis Conversaciones{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mb-5">
+    <div class="col-lg-10">
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} rounded-4 border-0 shadow-sm" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="d-flex align-items-center mb-4 gap-3">
+            <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center">
+                <i class="bi bi-chat-left-heart-fill text-primary fs-3"></i>
+            </div>
+            <div>
+                <h2 class="fw-bold mb-0">Bandeja de Chats</h2>
+                <p class="text-muted small mb-0">Historial completo de tus conversaciones sobre reportes.</p>
+            </div>
+        </div>
+
+        <div class="accordion" id="accordionChats">
+            {% for conv in conversaciones %}
+            <div class="accordion-item border mb-3 rounded-4 overflow-hidden shadow-sm">
+                
+                <h2 class="accordion-header">
+                    <button class="accordion-button {% if conv.otra_persona.pk == chat_persona and conv.mascota.pk == chat_mascota %}{% else %}collapsed{% endif %} bg-white py-3" type="button" data-bs-toggle="collapse" data-bs-target="#chat{{ forloop.counter }}">
+                        <div class="d-flex w-100 justify-content-between align-items-center me-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-person-circle fs-3 text-secondary"></i>
+                                <div>
+                                    <span class="fw-bold d-block text-dark">{{ conv.otra_persona.first_name|default:conv.otra_persona.email }}</span>
+                                    <small class="text-muted"><i class="bi bi-tag-fill me-1"></i>Caso: {{ conv.mascota.nombre }}</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-medium">{{ conv.mensajes|length }} mensajes</span>
+                        </div>
+                    </button>
+                </h2>
+
+                <div id="chat{{ forloop.counter }}" class="accordion-collapse collapse {% if conv.otra_persona.pk == chat_persona and conv.mascota.pk == chat_mascota %}show{% endif %}" data-bs-parent="#accordionChats">
+                    <div class="accordion-body bg-light bg-opacity-50 p-4">
+                        
+                        <div class="d-flex flex-column gap-3 mb-4" style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                            {% for msj in conv.mensajes %}
+                                
+                                {% if msj.remitente == user %}
+                                    <div class="d-flex justify-content-end">
+                                        <div class="p-3 rounded-4 shadow-sm" style="background-color: var(--pastel-primary); color: white; max-width: 75%; border-bottom-right-radius: 4px;">
+                                            <p class="mb-1 text-white">{{ msj.mensaje }}</p>
+                                            <div class="text-end" style="font-size: 0.7rem; opacity: 0.8;">
+                                                Tú • {{ msj.fecha_envio|date:"d M, H:i" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="d-flex justify-content-start">
+                                        <div class="bg-white p-3 rounded-4 shadow-sm border" style="max-width: 75%; border-bottom-left-radius: 4px;">
+                                            <p class="mb-1 text-dark">{{ msj.mensaje }}</p>
+                                            <div style="font-size: 0.7rem;" class="text-muted">
+                                                {{ msj.remitente.first_name|default:msj.remitente.email }} • {{ msj.fecha_envio|date:"d M, H:i" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                            {% endfor %}
+                        </div>
+
+                        <div class="bg-white p-3 rounded-4 border shadow-sm">
+                            <form method="post" action="{% url 'mascotas:responder_mensaje' conv.ultimo_msj_id %}">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input type="text" name="mensaje" class="form-control border-0 bg-light rounded-start-pill ps-4 shadow-none" placeholder="Escribe tu respuesta aquí..." required maxlength="500">
+                                    <button type="submit" class="btn btn-google-primary px-4 rounded-end-pill">
+                                        <i class="bi bi-send-fill me-1"></i> Responder
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            {% empty %}
+            <div class="card p-5 text-center text-muted border-0 shadow-sm">
+                <i class="bi bi-chat-square-quote fs-1 opacity-25 mb-3"></i>
+                <h5>No tienes ninguna conversación activa</h5>
+                <p class="small text-muted mb-0">Los chats aparecerán aquí cuando contactes al dueño de un reporte o te escriban a ti.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock content %}
