@@ -6,16 +6,16 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# Cargar variables de entorno desde el archivo .env de forma segura
-load_dotenv()
-
-# Rutas base del proyecto
+# 1. Definir primero las rutas base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# 2. Cargar variables de entorno apuntando DIRECTO a la ruta absoluta del .env
+load_dotenv(BASE_DIR / '.env')
 
 # Seguridad (Variables de entorno)
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,129.159.73.203').split(',')
 
 # Definición de aplicaciones
 INSTALLED_APPS = [
