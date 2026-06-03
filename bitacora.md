@@ -250,3 +250,169 @@ Vamos a decirle a Django que el Directorio ya no es público. Si alguien entra s
 Modificamos mascotas/views.py 
 
 # 42 Modificamos todo el css, agregamos unos logos, movimos de lugar unas cosas y ya todo bien.
+
+=================================================================================================
+
+# 43 Seguimos con el despliegue en OCI. 
+1.- Creamos la instancia y bajamos las keys (elegimos ubuntu) después ejecutamos en shell
+ ssh i "C:\Users\adria\Downloads\ssh-key-2026-06-03.key" ubuntu@1la ip
+
+ Una vez dentro tenemos que hacer ciertas cosas más
+
+2.- Actualizar el Sistema Operativo
+sudo apt update && sudo apt upgrade -y
+nos abre una ventana y solo damos enter.
+
+3.- Instalar Python 3.12 y Dependencias
+sudo add-apt-repository ppa:deadsnakes/ppa -y
+sudo apt update
+
+sudo: Le dice a Linux "Ejecuta esto con permisos de administrador (Superusuario)". Es necesario porque vas a modificar la configuración del sistema.
+
+add-apt-repository: Es la instrucción para agregar un nuevo "catálogo" o "tienda de aplicaciones" a tu servidor. Por defecto, Ubuntu solo busca descargas en sus catálogos oficiales.
+
+ppa:deadsnakes/ppa: Este es el nombre del catálogo que estamos agregando. Deadsnakes es un repositorio muy famoso, seguro y mantenido por la comunidad de Ubuntu, dedicado exclusivamente a alojar versiones de Python.
+
+¿Por qué lo necesitamos? Porque dependiendo de la versión de Ubuntu que instalaste en Oracle, su catálogo por defecto podría tener Python 3.10 o 3.11. El repositorio de Deadsnakes nos garantiza el acceso a Python 3.12.
+
+4.- Instalar el núcleo de Findy (Python, Nginx, PostgreSQL, Git):
+Con sudo apt install -y python3.12 python3.12-venv python3.12-dev postgresql postgresql-contrib nginx git curl libpq-dev
+
+5.- De ahi configuramos el firewall con: 
+sudo ufw allow 'Nginx Full'
+sudo ufw allow OpenSSH
+sudo ufw enable
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+ubuntu@findy-vcn:~$ sudo ufw allow 'Nginx Full'
+Rules updated
+Rules updated (v6)
+ubuntu@findy-vcn:~$ sudo ufw allow OpenSSH
+Rules updated
+Rules updated (v6)
+ubuntu@findy-vcn:~$ sudo ufw enable
+Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+Firewall is active and enabled on system startup
+ubuntu@findy-vcn:~$
+
+6.- Configuración de Base de Datos de Producción (PostgreSQL).
+sudo -u postgres psql
+
+postgres=# CREATE DATABASE mascotas_db;
+CREATE DATABASE
+postgres=# ALTER USER postgres WITH PASSWORD '#';
+ALTER ROLE
+postgres=# ALTER ROLE postgres SET client_encoding TO 'utf8';
+ALTER ROLE
+postgres=# ALTER ROLE postgres SET default_transaction_isolation TO 'read committed';
+ALTER ROLE
+postgres=# ALTER ROLE postgres SET timezone TO 'UTC';
+ALTER ROLE
+postgres=#
+
+7.- Despliegue de la Aplicación.
+Ponemos en la VM git clone https://github.com/Adrydmz/directorio_mascotas.git
+Entramos al dir
+cd directorio_mascotas
+
+8.- Creamos el entorno virtual
+python3.12 -m venv venv
+Y lo activamos con
+source venv/bin/activate 
+
+9.- Instalamos las dependencias
+Vamos a instalar todo lo que dice el archivo requirements.txt y agregaremos gunicorn (nuestro servidor de producción) y psycopg2-binary (el conector de PostgreSQL).
+pip install -r requirements.txt
+pip install gunicorn psycopg2-binary python-dotenv
+
+10.- Creamos el archivo .env
+nano .env
+SECRET_KEY=
+
+DEBUG=False
+
+ALLOWED_HOSTS=ip de oracle,localhost,127.0.0.1
+
+DB_NAME=mascotas_db
+
+DB_USER=postgres
+
+DB_PASSWORD=#
+
+DB_HOST=localhost
+
+DB_PORT=5432
+
+11.- Construir la Base de Datos y los Archivos Estáticos
+python manage.py makemigrations
+python manage.py migrate
+python manage.py collectstatic --noinput
+Este comando es un paso obligatorio y crítico en el despliegue de cualquier aplicación Django en producción.
+
+Para entenderlo a fondo, dividamos el comando en dos partes: qué hace collectstatic y qué significa el modificador --noinput.
+
+1. ¿Qué hace collectstatic?
+En la etapa de desarrollo (DEBUG=True), Django es muy amable y busca automáticamente los archivos CSS, JavaScript e imágenes (como tu Bootstrap o tus estilos personalizados) dentro de la carpeta static/ de cada una de tus aplicaciones (usuarios/static/, mascotas/static/, etc.) y los sirve en el navegador sin que tú hagas nada.
+
+Sin embargo, en producción (DEBUG=False), Django se niega rotundamente a servir archivos estáticos. ¿Por qué? Porque Django está diseñado para procesar lógica de Python (vistas, base de datos, lógica de negocio), y usarlo para entregar archivos pesados como CSS o imágenes de fondo volvería la aplicación extremadamente lenta. En producción, esa tarea se le delega a un servidor web ultra rápido como Nginx.
+
+Para que Nginx pueda entregar esos archivos, necesita que todos estén en un solo lugar físico del servidor, no repartidos por todo tu proyecto.
+
+Cuando ejecutas python manage.py collectstatic, Django:
+
+Revisa todas tus aplicaciones y carpetas del proyecto buscando archivos estáticos.
+
+Descarga también los archivos estáticos internos del propio panel de administración de Django (sus CSS, sus iconos, etc.).
+
+Copia absolutamente todos estos archivos dentro de una única carpeta centralizada que tú definiste en tu archivo settings.py bajo la variable STATIC_ROOT (que en nuestro caso se llamará staticfiles/).
+
+De este modo, Nginx solo tendrá que mirar esa carpeta staticfiles/ para entregarle el diseño Bootstrap a tus usuarios a la velocidad de la luz.
+¿Qué hace la bandera --noinput?
+Por defecto, si corres el comando a secas (python manage.py collectstatic), Django se detendrá a mitad del proceso y te hará una pregunta en la terminal:
+
+"This will overwrite existing files. Are you sure you want to do this? (yes/no):" (Esto sobrescribirá los archivos existentes. ¿Estás seguro de que quieres hacer esto?).
+
+Al agregarle --noinput, le estás diciendo a Django: "No me preguntes nada, sé exactamente lo que estoy haciendo, acepta la confirmación automáticamente y procesa todo de golpe".
+
+11.- Probamos con gunicorn --bind 0.0.0.0:8000 core.wsgi:application para probar
+
+12.- Ya creamos el servicio con gunicorn sudo nano /etc/systemd/system/gunicorn.service
+((venv) ) ubuntu@findy-vcn:~/directorio_mascotas$ sudo systemctl start gunicorn
+((venv) ) ubuntu@findy-vcn:~/directorio_mascotas$ sudo systemctl enable gunicorn
+Created symlink /etc/systemd/system/multi-user.target.wants/gunicorn.service → /etc/systemd/system/gunicorn.service.
+Configuramos NGIX publico
+sudo nano /etc/nginx/sites-available/findy
+server {
+    listen 80;
+    server_name 129.151.73.203;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+
+    location /static/ {
+        alias /home/ubuntu/directorio_mascotas/staticfiles/;
+    }
+
+    location /media/ {
+        alias /home/ubuntu/directorio_mascotas/media/;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/gunicorn.sock;
+    }
+}
+
+Activamos todo y reiniciamos Nginx:
+
+
+sudo ln -s /etc/nginx/sites-available/findy /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
+sudo nginx -t
+sudo systemctl restart nginx
+
+13.- No carga por lo que agregamos las ingress rules en las security lists de nuestro VCN que olvidamos hacerlo.
+Source CIDR: 0.0.0.0/0
+
+IP Protocol: TCP
+
+Destination Port Range: 80
