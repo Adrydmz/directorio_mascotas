@@ -240,3 +240,11 @@ TypeError: UserManager.create_user() missing 1 required positional argument: 'us
 Cuando construimos nuestro CustomUser, decidimos heredar de AbstractUser para no tener que programar el sistema de encriptación desde cero. Sin embargo, el administrador de usuarios por defecto de Django (UserManager) sigue exigiendo internamente el campo username al usar la función create_user() en el código puro (como en nuestras pruebas), a pesar de que para la interfaz web ya le dijimos que el inicio de sesión es con email.
 
 La solución es extremadamente sencilla y limpia: solo necesitamos pasarle un username simulado a nuestros usuarios de prueba en los archivos tests.py.
+
+# 39_2 Listo, los test pasaron, ahora guardaremos el progreso en git.
+
+# 40 Pasamos a agregar los estilos y hacer que la pagina se vea presentable. Creamos en static la carpeta css y style.css y modificamos el base.html para que lo cargue
+
+# 41 Decidimos transformar esa interfaz de un diseño básico a una experiencia Neumórfica / Googlesque (limpia, redondeada, colores pastel) y le inyectaremos luz neón siguiendo el cursor usando Vanilla JavaScript y CSS moderno.
+Vamos a decirle a Django que el Directorio ya no es público. Si alguien entra sin cuenta, lo mandará directamente a la pantalla de login.
+Modificamos mascotas/views.py 
