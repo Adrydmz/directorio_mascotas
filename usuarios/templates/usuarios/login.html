@@ -1,42 +1,41 @@
 {% extends 'base.html' %}
-
 {% block title %}Iniciar Sesión{% endblock %}
-
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-6 col-lg-5">
         
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags }} rounded-4 border-0 shadow-sm" role="alert">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         {% endif %}
 
-        <div class="card shadow border-primary">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Iniciar Sesión</h4>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">Entrar</button>
-                    </div>
-                </form>
-                
-                <div class="text-center mt-3">
-                    <a href="{% url 'usuarios:password_reset' %}" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+        <div class="card p-4 p-sm-5 shadow-sm">
+            <div class="text-center mb-4">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                    <i class="bi bi-person-fill text-primary fs-2"></i>
                 </div>
-
+                <h3 class="fw-bold">Te damos la bienvenida</h3>
+                <p class="text-muted small">Inicia sesión para acceder al Directorio</p>
             </div>
-            <div class="card-footer text-center">
-                <small>¿No tienes cuenta? <a href="{% url 'usuarios:registro' %}">Regístrate aquí</a></small>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-google-primary btn-lg">Siguiente</button>
+                </div>
+            </form>
+            <div class="text-center mt-4">
+                <a href="{% url 'usuarios:password_reset' %}" class="text-decoration-none fw-medium text-primary">¿Olvidaste tu contraseña?</a>
+            </div>
+            <hr class="my-4 text-muted opacity-25">
+            <div class="text-center">
+                <span class="text-muted small">¿No tienes cuenta?</span> 
+                <a href="{% url 'usuarios:registro' %}" class="text-decoration-none fw-bold text-primary ms-1">Crear cuenta</a>
             </div>
         </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock %}

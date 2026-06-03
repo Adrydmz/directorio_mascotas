@@ -1,11 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
+    /* Paleta Pastel Original */
     --pastel-bg: #f8f9fc;
     --pastel-primary: #82ccdd; /* Azul pastel */
     --pastel-secondary: #f6e58d; /* Amarillo pastel */
     --neon-glow: rgba(184, 233, 148, 0.5); /* Verde pastel neón para el glow */
     --text-dark: #2d3436;
+    --text-muted: #5f6368;
+    --border-color: #f1f2f6;
 }
 
 body {
@@ -18,10 +21,8 @@ body {
 /* Efecto Luz Neón que seguirá el mouse */
 #cursor-glow {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 350px;
-    height: 350px;
+    top: 0; left: 0;
+    width: 350px; height: 350px;
     background: radial-gradient(circle, var(--neon-glow) 0%, transparent 60%);
     border-radius: 50%;
     pointer-events: none; /* Crucial para poder dar clic a través de la luz */
@@ -50,83 +51,59 @@ main, .navbar {
     font-weight: 600;
 }
 
-/* Botones estilo Google (Pill shape) */
-.btn {
-    border-radius: 50px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    padding: 0.6rem 1.5rem;
-    transition: all 0.3s ease;
-    border: none;
-}
+/* ---------------------------------------------------
+   TARJETAS
+   --------------------------------------------------- */
 
-.btn-primary {
-    background-color: var(--pastel-primary);
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(130, 204, 221, 0.4);
-}
-
-.btn-primary:hover {
-    background-color: #60a3bc;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(96, 163, 188, 0.6);
-}
-
-.btn-success {
-    background-color: #b8e994;
-    color: #2d3436;
-    box-shadow: 0 4px 15px rgba(184, 233, 148, 0.4);
-}
-
-.btn-success:hover {
-    background-color: #78e08f;
-    transform: translateY(-2px);
-}
-
-.btn-outline-danger {
-    color: #ff7979;
-    border: 2px solid #ff7979;
-    background: transparent;
-}
-.btn-outline-danger:hover {
-    background-color: #ff7979;
-    color: white;
-}
-
-/* Tarjetas Googlesque */
+/* Tarjeta Base Estática (Para login, formularios, detalles, etc. - NO BRINCA) */
 .card {
     border: none;
     border-radius: 20px;
     background: #ffffff;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
 }
 
-.card:hover {
+/* Tarjeta del Directorio (SOLO esta salta y brilla al pasar el mouse) */
+.mascota-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mascota-card:hover {
     transform: translateY(-12px) scale(1.02);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08), 0 0 25px var(--neon-glow);
 }
 
-.card-img-top {
+.mascota-card .card-img-top {
     border-radius: 20px 20px 0 0;
     transition: transform 0.5s ease;
 }
 
-.card:hover .card-img-top {
+.mascota-card:hover .card-img-top {
     transform: scale(1.05);
 }
 
 .card-header {
     background-color: transparent;
-    border-bottom: 1px solid #f1f2f6;
+    border-bottom: 1px solid var(--border-color);
     padding-top: 1.5rem;
 }
 
-/* Inputs y Forms mucho más limpios */
+/* ---------------------------------------------------
+   FORMULARIOS Y ESTRUCTURA (Estilo Googlesque)
+   --------------------------------------------------- */
+form p { margin-bottom: 1.5rem; }
+form label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
 .form-control, .form-select {
     border-radius: 15px;
-    border: 2px solid #f1f2f6;
+    border: 2px solid var(--border-color);
     padding: 0.8rem 1.2rem;
     background-color: #fdfdfd;
     transition: all 0.3s ease;
@@ -138,3 +115,68 @@ main, .navbar {
     box-shadow: 0 0 15px rgba(130, 204, 221, 0.3);
     outline: none;
 }
+
+/* ---------------------------------------------------
+   BOTONES (Diseño Píldora con Colores Pastel)
+   --------------------------------------------------- */
+.btn {
+    border-radius: 50px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+/* Botones Azules Pastel (Soporta las clases de ambos códigos) */
+.btn-google-primary, .btn-primary {
+    background-color: var(--pastel-primary);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(130, 204, 221, 0.4);
+}
+.btn-google-primary:hover, .btn-primary:hover {
+    background-color: #60a3bc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(96, 163, 188, 0.6);
+    color: #fff;
+}
+
+/* Botones Verdes Pastel */
+.btn-google-success, .btn-success {
+    background-color: #b8e994;
+    color: #2d3436;
+    box-shadow: 0 4px 15px rgba(184, 233, 148, 0.4);
+}
+.btn-google-success:hover, .btn-success:hover {
+    background-color: #78e08f;
+    transform: translateY(-2px);
+    color: #2d3436;
+}
+
+/* Botones Rojos Pastel (Para eliminar y salir) */
+.btn-google-danger, .btn-outline-danger {
+    background-color: #ff7979;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 121, 121, 0.4);
+}
+.btn-google-danger:hover, .btn-outline-danger:hover {
+    background-color: #e84118;
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* Botones de Cancelar / Volver */
+.btn-google-outline {
+    background-color: white;
+    color: var(--pastel-primary);
+    border: 2px solid var(--border-color);
+}
+.btn-google-outline:hover {
+    background-color: var(--pastel-bg);
+    border-color: var(--pastel-primary);
+    transform: translateY(-2px);
+}
+
+/* Badges Pastel (Etiquetas de estado) */
+.badge-pastel-danger { background-color: #ffcccc; color: #d63031; }
+.badge-pastel-success { background-color: #c8e6c9; color: #2d3436; }

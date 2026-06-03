@@ -1,25 +1,24 @@
 {% extends 'base.html' %}
-
 {% block title %}Eliminar Reporte{% endblock %}
-
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6">
-        <div class="card shadow border-danger">
-            <div class="card-header bg-danger text-white">
-                <h4 class="mb-0">⚠️ Confirmar Eliminación</h4>
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card text-center p-4 p-sm-5 shadow-sm border-0">
+            <div class="mb-4">
+                <i class="bi bi-exclamation-circle text-danger" style="font-size: 4.5rem;"></i>
             </div>
-            <div class="card-body text-center">
-                <p class="lead mt-3">¿Estás absolutamente seguro de que deseas eliminar el reporte de <strong>{{ mascota.nombre }}</strong>?</p>
-                <p class="text-muted">Esta acción eliminará la fotografía y todos los datos asociados de la base de datos de forma permanente.</p>
+            <h3 class="fw-bold mb-3">¿Eliminar publicación?</h3>
+            
+            <p class="text-muted mb-4">Esta acción borrará permanentemente a <strong>{{ object.nombre }}</strong> y no se puede deshacer.</p>
+            
+            <form method="post" class="d-flex justify-content-center gap-3 mt-2">
+                {% csrf_token %}
                 
-                <form method="post" class="mt-4 mb-2">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-lg me-2">Sí, eliminar permanentemente</button>
-                    <a href="{% url 'mascotas:detalle_mascota' mascota.pk %}" class="btn btn-secondary btn-lg">Cancelar</a>
-                </form>
-            </div>
+                <a href="{% url 'mascotas:detalle_mascota' object.pk %}" class="btn btn-google-outline flex-grow-1">Cancelar</a>
+                
+                <button type="submit" class="btn btn-google-danger flex-grow-1">Sí, eliminar</button>
+            </form>
         </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock %}

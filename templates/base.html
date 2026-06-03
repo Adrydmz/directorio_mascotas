@@ -16,16 +16,17 @@
 
     <nav class="navbar navbar-expand-lg mb-5 sticky-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'mascotas:lista_mascotas' %}">
-                <i class="bi bi-box2-heart text-primary fs-4"></i>
-                <span>Directorio Mascotas</span>
+            {% load static %} <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'mascotas:lista_mascotas' %}">
+                <img src="/media/FindyLogoMinimalist.png" alt="Findy" style="width: 40px; height: 40px; object-fit: contain;">
+                <span class="fw-bold fs-4 text-dark"><span class="text-primary"></span></span>
             </a>
+            
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <i class="bi bi-list fs-2 text-dark"></i>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    
                     {% if user.is_authenticated %}
                         <li class="nav-item d-flex align-items-center me-4">
                             {% if user.avatar %}
@@ -49,7 +50,6 @@
                             <a class="nav-link btn btn-primary text-white px-4" href="{% url 'usuarios:registro' %}">Registrarse</a>
                         </li>
                     {% endif %}
-
                 </ul>
             </div>
         </div>

@@ -1,43 +1,63 @@
 {% extends 'base.html' %}
-
-{% block title %}Detalles de {{ mascota.nombre }}{% endblock %}
-
+{% block title %}{{ mascota.nombre }}{% endblock %}
 {% block content %}
-<div class="row mt-4">
-    <div class="col-md-6 mb-4">
-        {% if mascota.fotografia %}
-            <img src="{{ mascota.fotografia.url }}" class="img-fluid rounded shadow w-100" alt="Foto de {{ mascota.nombre }}" style="max-height: 500px; object-fit: cover;">
-        {% else %}
-            <div class="bg-secondary text-white text-center rounded shadow d-flex align-items-center justify-content-center" style="height: 400px;">
-                <p>Sin fotografía</p>
-            </div>
-        {% endif %}
-    </div>
-    <div class="col-md-6">
-        <h2 class="display-5">
-            {{ mascota.nombre }} 
-            <span class="badge fs-6 align-middle {% if mascota.estado == 'PERDIDA' %}bg-danger{% else %}bg-success{% endif %}">
-                {{ mascota.get_estado_display }}
-            </span>
-        </h2>
-        <hr>
-        <ul class="list-group list-group-flush mb-4 fs-5">
-            <li class="list-group-item"><strong>Especie:</strong> {{ mascota.get_especie_display }}</li>
-            <li class="list-group-item"><strong>Raza:</strong> {{ mascota.raza }}</li>
-            <li class="list-group-item"><strong>Ubicación de extravío:</strong> {{ mascota.ubicacion }}</li>
-            <li class="list-group-item"><strong>Recompensa:</strong> {% if mascota.recompensa %}${{ mascota.recompensa }}{% else %}No especificada{% endif %}</li>
-            <li class="list-group-item"><strong>Fecha de reporte:</strong> {{ mascota.fecha_reporte|date:"d M Y" }}</li>
-            <li class="list-group-item"><strong>Reportado por:</strong> <a href="mailto:{{ mascota.usuario_reporta.email }}">{{ mascota.usuario_reporta.email }}</a></li>
-        </ul>
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-lg-10">
+        <a href="{% url 'mascotas:lista_mascotas' %}" class="text-decoration-none text-muted mb-4 d-inline-block fw-medium">
+            <i class="bi bi-arrow-left me-2"></i>Volver al directorio
+        </a>
+        <div class="card p-0 overflow-hidden shadow-sm border-0">
+            <div class="row g-0">
+                <div class="col-md-6 bg-light d-flex align-items-center justify-content-center" style="min-height: 400px;">
+                    {% if mascota.fotografia %}
+                        <img src="{{ mascota.fotografia.url }}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="{{ mascota.nombre }}">
+                    {% else %}
+                        <i class="bi bi-image text-muted opacity-25" style="font-size: 5rem;"></i>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 p-4 p-lg-5 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h2 class="display-5 fw-bold mb-0 text-dark">{{ mascota.nombre }}</h2>
+                        <span class="badge rounded-pill {% if mascota.estado == 'PERDIDA' %}badge-pastel-danger{% else %}badge-pastel-success{% endif %} px-3 py-2 fw-medium">
+                            {{ mascota.get_estado_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="mb-4 mt-2">
+                        <p class="text-muted fs-5 mb-2"><i class="bi bi-tag text-primary me-2 opacity-75"></i>{{ mascota.get_especie_display }} • {{ mascota.raza }}</p>
+                        <p class="text-muted fs-5"><i class="bi bi-geo-alt text-primary me-2 opacity-75"></i>{{ mascota.ubicacion }}</p>
+                    </div>
 
-        <div class="d-flex gap-2">
-            <a href="{% url 'mascotas:lista_mascotas' %}" class="btn btn-secondary">Volver al Directorio</a>
-            
-            {% if user == mascota.usuario_reporta %}
-                <a href="{% url 'mascotas:editar_mascota' mascota.pk %}" class="btn btn-warning">Editar Reporte</a>
-                <a href="{% url 'mascotas:eliminar_mascota' mascota.pk %}" class="btn btn-danger">Eliminar Reporte</a>
-            {% endif %}
+                    <div class="bg-light rounded-4 p-4 mb-4">
+                        <div class="row text-center">
+                            <div class="col-6 border-end">
+                                <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Recompensa</span>
+                                <span class="fs-4 fw-bold text-success">{% if mascota.recompensa %}${{ mascota.recompensa }}{% else %}N/A{% endif %}</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Fecha Reporte</span>
+                                <span class="fs-5 fw-medium text-dark">{{ mascota.fecha_reporte|date:"d M Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-auto">
+                        <p class="text-muted small mb-1 fw-medium">Reportado por:</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-person-circle fs-3 text-secondary"></i>
+                            <a href="mailto:{{ mascota.usuario_reporta.email }}" class="text-decoration-none fw-medium text-dark">{{ mascota.usuario_reporta.email }}</a>
+                        </div>
+                    </div>
+
+                    {% if user == mascota.usuario_reporta %}
+                    <div class="d-flex gap-2 mt-4 pt-4" style="border-top: 1px solid var(--border-color);">
+                        <a href="{% url 'mascotas:editar_mascota' mascota.pk %}" class="btn btn-google-outline flex-grow-1"><i class="bi bi-pencil me-2"></i>Editar</a>
+                        <a href="{% url 'mascotas:eliminar_mascota' mascota.pk %}" class="btn btn-google-danger flex-grow-1"><i class="bi bi-trash me-2"></i>Eliminar</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock %}

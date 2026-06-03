@@ -248,3 +248,5 @@ La solución es extremadamente sencilla y limpia: solo necesitamos pasarle un us
 # 41 Decidimos transformar esa interfaz de un diseño básico a una experiencia Neumórfica / Googlesque (limpia, redondeada, colores pastel) y le inyectaremos luz neón siguiendo el cursor usando Vanilla JavaScript y CSS moderno.
 Vamos a decirle a Django que el Directorio ya no es público. Si alguien entra sin cuenta, lo mandará directamente a la pantalla de login.
 Modificamos mascotas/views.py 
+
+# 42 Modificamos todo el css, agregamos unos logos, movimos de lugar unas cosas y ya todo bien.
