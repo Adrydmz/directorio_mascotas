@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalles de {{ mascota.nombre }}{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-6 mb-4">
+        {% if mascota.fotografia %}
+            <img src="{{ mascota.fotografia.url }}" class="img-fluid rounded shadow w-100" alt="Foto de {{ mascota.nombre }}" style="max-height: 500px; object-fit: cover;">
+        {% else %}
+            <div class="bg-secondary text-white text-center rounded shadow d-flex align-items-center justify-content-center" style="height: 400px;">
+                <p>Sin fotografía</p>
+            </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h2 class="display-5">
+            {{ mascota.nombre }} 
+            <span class="badge fs-6 align-middle {% if mascota.estado == 'PERDIDA' %}bg-danger{% else %}bg-success{% endif %}">
+                {{ mascota.get_estado_display }}
+            </span>
+        </h2>
+        <hr>
+        <ul class="list-group list-group-flush mb-4 fs-5">
+            <li class="list-group-item"><strong>Especie:</strong> {{ mascota.get_especie_display }}</li>
+            <li class="list-group-item"><strong>Raza:</strong> {{ mascota.raza }}</li>
+            <li class="list-group-item"><strong>Ubicación de extravío:</strong> {{ mascota.ubicacion }}</li>
+            <li class="list-group-item"><strong>Recompensa:</strong> {% if mascota.recompensa %}${{ mascota.recompensa }}{% else %}No especificada{% endif %}</li>
+            <li class="list-group-item"><strong>Fecha de reporte:</strong> {{ mascota.fecha_reporte|date:"d M Y" }}</li>
+            <li class="list-group-item"><strong>Reportado por:</strong> <a href="mailto:{{ mascota.usuario_reporta.email }}">{{ mascota.usuario_reporta.email }}</a></li>
+        </ul>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'mascotas:lista_mascotas' %}" class="btn btn-secondary">Volver al Directorio</a>
+            
+            {% if user == mascota.usuario_reporta %}
+                <a href="{% url 'mascotas:editar_mascota' mascota.pk %}" class="btn btn-warning">Editar Reporte</a>
+                <a href="{% url 'mascotas:eliminar_mascota' mascota.pk %}" class="btn btn-danger">Eliminar Reporte</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

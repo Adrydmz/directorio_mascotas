@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Reporte{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">⚠️ Confirmar Eliminación</h4>
+            </div>
+            <div class="card-body text-center">
+                <p class="lead mt-3">¿Estás absolutamente seguro de que deseas eliminar el reporte de <strong>{{ mascota.nombre }}</strong>?</p>
+                <p class="text-muted">Esta acción eliminará la fotografía y todos los datos asociados de la base de datos de forma permanente.</p>
+                
+                <form method="post" class="mt-4 mb-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg me-2">Sí, eliminar permanentemente</button>
+                    <a href="{% url 'mascotas:detalle_mascota' mascota.pk %}" class="btn btn-secondary btn-lg">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro de Usuario{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Crear una Cuenta</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">Registrarme</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <small>¿Ya tienes una cuenta? <a href="{% url 'usuarios:login' %}">Inicia Sesión aquí</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
