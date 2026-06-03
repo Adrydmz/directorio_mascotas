@@ -1,14 +1,32 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from .models import MascotaPerdida
 from .forms import MascotaPerdidaForm
 
 class MascotaListView(ListView):
-    """Vista pública para listar todas las mascotas (Read)."""
+    """Vista pública para listar todas las mascotas (Read) con buscador integrado."""
     model = MascotaPerdida
     template_name = 'mascotas/mascota_list.html'
     context_object_name = 'mascotas'
+
+    def get_queryset(self):
+        # Obtenemos la lista base de mascotas
+        queryset = super().get_queryset()
+        
+        # Capturamos lo que el usuario escribió en la barra de búsqueda (parámetro 'q')
+        query = self.request.GET.get('q')
+        
+        # Si el usuario escribió algo, filtramos los resultados en la base de datos
+        if query:
+            queryset = queryset.filter(
+                Q(nombre__icontains=query) |
+                Q(especie__icontains=query) |
+                Q(raza__icontains=query) |
+                Q(ubicacion__icontains=query)
+            )
+        return queryset
 
 class MascotaDetailView(DetailView):
     """Vista pública para ver los detalles de una mascota específica."""

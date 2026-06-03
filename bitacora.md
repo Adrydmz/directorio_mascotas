@@ -205,3 +205,38 @@ Añadimos la lógica condicional que verifica si el usuario tiene una foto de pe
 # 34 Para cumplir con el requisito de Restablecimiento de contraseña mediante correo, necesitamos crear la interfaz visual para los cuatro pasos de este proceso.
 
 # 34.1 Decisión técnica: Crearemos estas cuatro plantillas dentro de la carpeta usuarios/templates/usuarios,  heredaremos de base.html y usaremos el diseño de tarjetas (cards) de Bootstrap 5 para mantener la coherencia visual con tu formulario de inicio de sesión y registro. Empezando con password_reset_form.html -> password_reset_done -> password_reset_confirm y password_reset_complete.html.
+
+Por seguridad aqui hicimos nuestro segundo commit :p
+
+# 34.2 Creamos password_reset_email.html este archivo de plantilla no requiere etiquetas HTML, clases de Bootstrap ni heredar de base.html. Su única función es actuar como texto plano donde Django inyecta los tokens criptográficos de un solo uso (uidb64 y token) para garantizar la seguridad de la cuenta al generar el enlace de recuperación.
+
+# 35 Ahora vamos a implementar la funcionalidad de búsqueda (por especie, raza o ubicación) recomendada por tu rúbrica como "Requisito Diferenciador".
+
+Decisión técnica: Para implementar un buscador eficiente sin instalar librerías pesadas de terceros, utilizaremos el objeto Q nativo de Django. Esto nos permite hacer consultas complejas con el operador lógico OR en nuestra base de datos PostgreSQL, buscando coincidencias simultáneas en múltiples campos (nombre, especie, raza o ubicación). Además, usaremos el método GET en el formulario HTML para que las búsquedas se puedan compartir mediante URL.
+
+# 36 Modificamos mascotas/views.py y mascota_list.py
+
+# 37 Se nos ocurrio hacer un live search en vez de la barra normal asi que tomamos la decisión técnica de usar Vanilla JavaScript (el JavaScript puro del navegador) utilizando la API Fetch. Haremos que JavaScript escuche cada vez que tecleas una letra, envíe la petición al servidor en segundo plano, extraiga las tarjetas resultantes y las reemplace en la pantalla sin que la página parpadee. Además, implementaremos una técnica vital de nivel Senior llamada "Debounce": esto hace que el sistema espere unos milisegundos (ej. 300ms) después de tu última tecla antes de buscar. Si no hacemos esto, buscar la palabra "Perro" haría 5 consultas a tu base de datos PostgreSQL, colapsando el servidor.
+
+# 38 Ahora pasaremos a la creación de mínimo 5 pruebas funcionales:
+
+Test de modelo.
+
+Test de registro.
+
+Test de login.
+
+Test de creación de entidad.
+
+Test de vista protegida.
+
+# Decisión técnica: Utilizaremos el framework nativo django.test.TestCase. La gran ventaja de esta herramienta es que Django creará una base de datos en blanco especial para las pruebas, ejecutará nuestras funciones, y luego la destruirá. Así garantizamos que tu base de datos principal de PostgreSQL jamás se ensucie con datos de prueba.
+
+# 39 Modificamos usuarios/tests.py con esto cumplimos con las primeras tres pruebas obligatorias. Probamos la inserción en el modelo de base de datos, verificamos que la vista de registro devuelva un código HTTP 200 (Éxito), y validamos que el motor de autenticación acepte el inicio de sesión y nos pasamos a mascotas/tests.py con esto Completamos las 5 pruebas de la rúbrica validando la creación de la entidad principal y asegurándonos de que nuestro LoginRequiredMixin funciona correctamente bloqueando la ruta a usuarios que no hayan iniciado sesión. Y pasamos a la ejecucion de las pruebas con el comando python manage.py test y todo falló jajajaja como se muestra en la imagen, veremos que pasó.
+
+Si leemos la última línea de cualquiera de los errores en tu consola, dice:
+TypeError: UserManager.create_user() missing 1 required positional argument: 'username'
+
+Cuando construimos nuestro CustomUser, decidimos heredar de AbstractUser para no tener que programar el sistema de encriptación desde cero. Sin embargo, el administrador de usuarios por defecto de Django (UserManager) sigue exigiendo internamente el campo username al usar la función create_user() en el código puro (como en nuestras pruebas), a pesar de que para la interfaz web ya le dijimos que el inicio de sesión es con email.
+
+La solución es extremadamente sencilla y limpia: solo necesitamos pasarle un username simulado a nuestros usuarios de prueba en los archivos tests.py.
