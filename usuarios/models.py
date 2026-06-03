@@ -13,8 +13,14 @@ class CustomUser(AbstractUser):
     # Establecemos el correo electrónico como el método principal de autenticación
     USERNAME_FIELD = 'email'
     
-    # 'username' es obligatorio en la jerarquía de AbstractUser, se requiere al crear superusuarios por consola
+    # Al crear un superusuario por consola, nos pedirá estos campos
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+
+    def save(self, *args, **kwargs):
+        # TRUCO: Si no viene un username, le asignamos el valor del email automáticamente
+        if not self.username:
+            self.username = self.email
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.email
